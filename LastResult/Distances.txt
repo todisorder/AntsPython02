@@ -1,0 +1,50 @@
+# Ant nr. 1 total distance.;# Ant nr. 1 total Y distance.
+226.639;142.653
+# Ant nr. 2 total distance.;# Ant nr. 2 total Y distance.
+226.574;138.095
+# Ant nr. 3 total distance.;# Ant nr. 3 total Y distance.
+215.013;-38.1004
+# Ant nr. 4 total distance.;# Ant nr. 4 total Y distance.
+202.01;-84.7025
+# Ant nr. 5 total distance.;# Ant nr. 5 total Y distance.
+230.262;131.853
+# Ant nr. 6 total distance.;# Ant nr. 6 total Y distance.
+112.702;-107.107
+# Ant nr. 7 total distance.;# Ant nr. 7 total Y distance.
+85.494;-84.3144
+# Ant nr. 8 total distance.;# Ant nr. 8 total Y distance.
+59.9449;-58.3419
+# Ant nr. 9 total distance.;# Ant nr. 9 total Y distance.
+131.901;-73.7335
+# Ant nr. 10 total distance.;# Ant nr. 10 total Y distance.
+153.639;128.433
+# Ant nr. 11 total distance.;# Ant nr. 11 total Y distance.
+205.421;201.861
+# Ant nr. 12 total distance.;# Ant nr. 12 total Y distance.
+278.258;-191.705
+# Ant nr. 13 total distance.;# Ant nr. 13 total Y distance.
+281.754;-237.199
+# Ant nr. 14 total distance.;# Ant nr. 14 total Y distance.
+65.658;-58.4958
+# Ant nr. 15 total distance.;# Ant nr. 15 total Y distance.
+268.812;-162.085
+# Ant nr. 16 total distance.;# Ant nr. 16 total Y distance.
+182.28;181.552
+# Ant nr. 17 total distance.;# Ant nr. 17 total Y distance.
+257.039;-7.22893
+# Ant nr. 18 total distance.;# Ant nr. 18 total Y distance.
+255.574;-233.394
+# Ant nr. 19 total distance.;# Ant nr. 19 total Y distance.
+134.546;-117.627
+# Ant nr. 20 total distance.;# Ant nr. 20 total Y distance.
+249.319;8.47739
+# Ant nr. 21 total distance.;# Ant nr. 21 total Y distance.
+241.157;235.994
+# Ant nr. 22 total distance.;# Ant nr. 22 total Y distance.
+139.359;78.251
+# Ant nr. 23 total distance.;# Ant nr. 23 total Y distance.
+280.826;251.479
+# Ant nr. 24 total distance.;# Ant nr. 24 total Y distance.
+270.744;-216.663
+# Ant nr. 25 total distance.;# Ant nr. 25 total Y distance.
+230.058;-212.547
