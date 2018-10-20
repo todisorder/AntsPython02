@@ -6,7 +6,7 @@ from random import *
 #from tkinter import *
 #from tkinter import messagebox
 #import turtle
-from multiprocessing import Process, Pool
+from multiprocessing import Process
 from file_to_be_read_by_python import *
 
 
@@ -102,6 +102,8 @@ def FeltPheromone_right(ant):
 
 
 def ComputeForcex(ant):
+#    print('rrrrrrrrr',  FeltPheromone_right(ant))
+#    print('lllllllll',  FeltPheromone_left(ant))
     numerator = (ant.left_antennax() - ant.posx) * FeltPheromone_left(ant) + (ant.right_antennax() - ant.posx) * FeltPheromone_right(ant)
     denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
     ant.forcex = numerator/denom
@@ -110,23 +112,6 @@ def ComputeForcey(ant):
     numer = (ant.left_antennay() - ant.posy) * FeltPheromone_left(ant) + (ant.right_antennay() - ant.posy) * FeltPheromone_right(ant)
     denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
     ant.forcey = numer/denom
-
-def ComputeForce(ant):
-    ax = ant.posx
-    ay = ant.posy
-    alx = ant.left_antennax()
-    aly = ant.left_antennay()
-    arx = ant.right_antennax()
-    ary = ant.right_antennay()
-    fpl = FeltPheromone_left(ant)
-    fpr = FeltPheromone_right(ant)
-    denom = fpl + fpr
-    numerx = (alx - ax)*fpl + (arx - ax)*fpr
-    Fx = numerx/denom
-    numery = (aly - ay)*fpl + (ary - ay)*fpr
-    Fy = numery/denom
-    ant.forcex = Fx
-    ant.forcey = Fy
 
 each = 8
 
@@ -137,9 +122,8 @@ def Walk(ant,iter):
     ant.posyold = ant.posy
     ant.velxold = ant.velx
     ant.velyold = ant.vely
-#    ComputeForcex(ant)
-#    ComputeForcey(ant)
-    ComputeForce(ant)
+    ComputeForcex(ant)
+    ComputeForcey(ant)
     newvelx = ant.velxold + delta_t * (1./TAU)*(-ant.velxold + 1.*ant.forcex)
     newvely = ant.velyold + delta_t * (1./TAU)*(-ant.velyold + 1.*ant.forcey)
 #    print('vel',newvely)
@@ -229,15 +213,26 @@ def update(iter):
     CurrentTime = CurrentTime + delta_t
 #    print('Calling update with iter =',iter)
 
-    b = list(range(NumberOfAnts))
-    c = [(i,iter) for i in b]
-#    pool = Pool(processes = NumberOfAnts)
-#    a = pool.starmap(AdvanceAnt,c)
-    d = [iter for i in b]
-#    map(AdvanceAnt,b,d)
-
+#    procs = []
+    a = range(NumberOfAnts)
+    b = [a[i]*4 for i in range(int(len(a)/4))]
     for j in b:
-        AdvanceAnt(j,iter)     # THIS WORKS.
+        procs = []
+#        print('j = ',j)
+        for core in [j+0,j+1,j+2,j+3]:
+#            print(core)
+            proc = Process(target=AdvanceAnt,args=tuple([core]+[iter]))
+#            print('Should be Calling AdvanceAnt with ant nr =',core)
+            procs.append(proc)
+            proc.start()
+        for proc in procs:
+            proc.join()
+
+    
+
+#    for j in range(NumberOfAnts):
+#        AdvanceAnt(j)
+
 
     drawing.set_offsets(toons['position'])
 
