@@ -1,15 +1,24 @@
 #import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Button
 from matplotlib.animation import FuncAnimation
 from random import *
 #from tkinter import *
 #from tkinter import messagebox
 #import turtle
-from multiprocessing import Process, Pool
+import multiprocessing as mp
+import time
+start_time = time.time()
+
+
+
+
+
 from file_to_be_read_by_python import *
 
 
+Pi = np.pi
 
 CurrentTime = delta_t
 
@@ -128,7 +137,8 @@ def ComputeForce(ant):
     ant.forcex = Fx
     ant.forcey = Fy
 
-each = 8
+each = 2
+save_every = 10
 
 def Walk(ant,iter):
     global each
@@ -142,7 +152,7 @@ def Walk(ant,iter):
     ComputeForce(ant)
     newvelx = ant.velxold + delta_t * (1./TAU)*(-ant.velxold + 1.*ant.forcex)
     newvely = ant.velyold + delta_t * (1./TAU)*(-ant.velyold + 1.*ant.forcey)
-#    print('vel',newvely)
+#    print('changed velocity from {} to {}'.format(ant.velyold,newvely))
     newposx = ant.posxold + delta_t * newvelx
     newposy = ant.posyold + delta_t * newvely
     
@@ -150,16 +160,20 @@ def Walk(ant,iter):
         newposx = newposx + np.sign(x_2 - newposx)*(x_2-x_1)
     if newposy >= y_2 or newposy <= y_1:
         newposy = newposy + np.sign(y_2 - newposy)*(y_2-y_1)
+#    print('changed position from {} to {}'.format(ant.posx,newposx))
 
     ant.posx = newposx
     ant.posy = newposy
     ant.velx = newvelx
     ant.vely = newvely
 
-    if (iter+1)%each == 0:
-#        print('eeeee')
-        droplet = Droplet(ant,0)
-        AllThePheromone.append(droplet)
+#    if (iter+1)%each == 0:
+##        print('eeeee')
+#        droplet = Droplet(ant,0)
+#        AllThePheromone.append(droplet)
+
+
+    return [ant.posx,ant.posy]
 
 
 
@@ -208,8 +222,13 @@ drawing2 = [ax.scatter(tailx[j],taily[j],3) for j in range(NumberOfAnts)]
 AllTails = [0.,0.]*NumberOfAnts
 
 def AdvanceAnt(j,iter):
+    global AllTheAnts
 #    print('Calling AdvanceAnt with ant nr =',j,' iter = ',iter)
-    Walk(AllTheAnts[j],iter)
+#    (AllTheAnts[j].posx,AllTheAnts[j].posy) = Walk(AllTheAnts[j],iter)
+    return [j,Walk(AllTheAnts[j],iter)]
+
+    
+def AdvanceAnt2(j,iter):
     toons['position'][j][0] = AllTheAnts[j].posx
     toons['position'][j][1] = AllTheAnts[j].posy
     tailx[j].pop(0)
@@ -218,7 +237,11 @@ def AdvanceAnt(j,iter):
     taily[j].append(AllTheAnts[j].posy)
     AllTails = [[tailx[j][k],taily[j][k]] for k in range(tail_length)]
     AllTails = np.array(AllTails)
+#    print(AllTails)
     drawing2[j].set_offsets(AllTails)
+    if (iter+1)%save_every == 0:
+#        print("Wazzzup")
+        save_this_ant(AllTheAnts[j],j)
 
 
 def update(iter):
@@ -226,24 +249,52 @@ def update(iter):
     global AllThePheromone
     global PreviousPheromone
     global AllTails
+    global AllTheAnts
     CurrentTime = CurrentTime + delta_t
 #    print('Calling update with iter =',iter)
 
     b = list(range(NumberOfAnts))
+    
+    cores = mp.cpu_count()
+#    cores=1
+    pool = mp.Pool(cores)
+    print('using {} cores'.format(cores))
+
+
     c = [(i,iter) for i in b]
-#    pool = Pool(processes = NumberOfAnts)
-#    a = pool.starmap(AdvanceAnt,c)
     d = [iter for i in b]
-#    map(AdvanceAnt,b,d)
+    
+
+    result = pool.starmap(AdvanceAnt,[(j,iter) for j in b])
+#    print(result)
+    pool.close()
+    for j in [result[k][0] for k in range(len(result))]:
+        AllTheAnts[j].posx = result[j][1][0]
+        AllTheAnts[j].posy = result[j][1][1]
+        if (iter+1)%each == 0:
+            droplet = Droplet(AllTheAnts[j],0)
+            AllThePheromone.append(droplet)
+
+
 
     for j in b:
-        AdvanceAnt(j,iter)     # THIS WORKS.
+        AdvanceAnt2(j,iter)
+
+
+#    for j in b:
+#        AdvanceAnt(j,iter)     # THIS WORKS.
+#        AdvanceAnt2(j,iter)
+
+#    for j in b:
+#        AdvanceAnt(j,iter)     # THIS WORKS.
 
     drawing.set_offsets(toons['position'])
 
     AllThePheromone = AllThePheromone[-MaxActiveDropletsPerAnt:]
     PreviousPheromone = AllThePheromone
     print('iter = ',iter,' Current time = ', CurrentTime, 'drops = ', len(PreviousPheromone))
+    execution_time = time.time() - start_time
+    print('--- {} seconds per iteration ---'.format(execution_time/(iter+1)))
 
 fig.canvas.mpl_connect('key_press_event', on_press)
 
@@ -253,7 +304,24 @@ def do_animation():
     animation = FuncAnimation(fig,update,range(400))
     return animation
 
+def save_this_ant(ant,j):
+    filename = "hahahah-{:03d}.txt".format(j)
+#    f = open(filename,"w").close()
+    f = open(filename,"a")
+    f.write("{:010f}\t{:010f}\n".format(ant.posx,ant.posy))
+    f.close()
 
+
+def save_ants(event=None):
+    for j in range(NumberOfAnts):
+        save_this_ant(AllTheAnts[j],j)
+
+
+axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
+axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
+bnext = Button(axnext, 'Next')
+bprev = Button(axprev, 'Previous')
+bnext.on_clicked(save_ants)
 
 animation = do_animation()
 animation.running = True
@@ -262,16 +330,4 @@ plt.show()
 
 
 
-#print(Heat(.5,0,20.))
-#Angle(1,2)
-#AngleBetween(1,2,3,4)
-#print(AllTheAnts[3].vely)
-#print(AllTheAnts[3].left_antennax())
-#print(FeltPheromone_left(AllTheAnts[3]))
-#
-#drop = Droplet(AllTheAnts[3],1)
-#drop.show()
-#print([i.posx for i in AllTheAnts],"dede")
-
-#wn.exitonclick()
 
