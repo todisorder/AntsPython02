@@ -137,7 +137,7 @@ def ComputeForce(ant):
     ant.forcex = Fx
     ant.forcey = Fy
 
-each = 2
+each = 10
 save_every = 10
 
 def Walk(ant,iter):
@@ -243,6 +243,10 @@ def AdvanceAnt2(j,iter):
 #        print("Wazzzup")
         save_this_ant(AllTheAnts[j],j)
 
+cores = mp.cpu_count()
+#    cores=1
+print('using {} cores'.format(cores))
+
 
 def update(iter):
     global CurrentTime
@@ -250,16 +254,13 @@ def update(iter):
     global PreviousPheromone
     global AllTails
     global AllTheAnts
+    global cores
     CurrentTime = CurrentTime + delta_t
 #    print('Calling update with iter =',iter)
 
     b = list(range(NumberOfAnts))
     
-    cores = mp.cpu_count()
-#    cores=1
     pool = mp.Pool(cores)
-    print('using {} cores'.format(cores))
-
 
     c = [(i,iter) for i in b]
     d = [iter for i in b]
@@ -292,16 +293,16 @@ def update(iter):
 
     AllThePheromone = AllThePheromone[-MaxActiveDropletsPerAnt:]
     PreviousPheromone = AllThePheromone
-    print('iter = ',iter,' Current time = ', CurrentTime, 'drops = ', len(PreviousPheromone))
+#    print('iter = ',iter,' Current time = ', CurrentTime, 'drops = ', len(PreviousPheromone))
     execution_time = time.time() - start_time
-    print('--- {} seconds per iteration ---'.format(execution_time/(iter+1)))
+    print('--- {} seconds per iteration after {} iterations and {} droplets---'.format(execution_time/(iter+1),iter,len(PreviousPheromone)),end='\r')
 
 fig.canvas.mpl_connect('key_press_event', on_press)
 
 def do_animation():
     global fig
     global update
-    animation = FuncAnimation(fig,update,range(400))
+    animation = FuncAnimation(fig,update)
     return animation
 
 def save_this_ant(ant,j):
@@ -327,6 +328,7 @@ animation = do_animation()
 animation.running = True
 plt.show()
 
+print('')
 
 
 
