@@ -1,5 +1,5 @@
 import numpy as np
-NumberOfAnts = 100
+NumberOfAnts = 10
 MaxActiveDropletsPerAnt = 300
 seed1 = 1
 t_hat_in_seconds = 1.0

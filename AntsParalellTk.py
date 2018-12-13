@@ -1,8 +1,9 @@
 #import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Button
-from matplotlib.animation import FuncAnimation
+import matplotlib
+#import matplotlib.pyplot as plt    # this crashes when using tkinter
+#from matplotlib.widgets import Button
+#from matplotlib.animation import FuncAnimation
 from random import *
 import tkinter as tk
 #from tkinter import *
@@ -333,7 +334,7 @@ def do_animation(iter):
     for j in list(range(NumberOfAnts)):
 	    AllTheAnts[j].move()
 	    window.update()
-	    window.after(5)
+#	    window.after(0)
 #    window.after(0,do_animation)
     
 
@@ -351,11 +352,11 @@ def save_ants(event=None):
         save_this_ant(AllTheAnts[j],j)
 
 
-axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
-axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-bnext = Button(axnext, 'Next')
-bprev = Button(axprev, 'Previous')
-bnext.on_clicked(save_ants)
+#axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
+#axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
+#bnext = Button(axnext, 'Next')
+#bprev = Button(axprev, 'Previous')
+#bnext.on_clicked(save_ants)
 
 # animation = do_animation()
 # animation.running = True
