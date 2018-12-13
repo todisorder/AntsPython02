@@ -1,7 +1,8 @@
 #import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
-#import matplotlib.pyplot as plt    # this crashes when using tkinter
+matplotlib.use("TkAgg")         # If this is not here on macOS, then importing pyplot crashes.
+import matplotlib.pyplot as plt
 #from matplotlib.widgets import Button
 #from matplotlib.animation import FuncAnimation
 from random import *
