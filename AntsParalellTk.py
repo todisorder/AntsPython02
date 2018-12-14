@@ -25,6 +25,7 @@ Pi = np.pi
 
 CurrentTime = delta_t
 
+canvas_size = 400       # in pixels
 
 class Ant:
     def __init__(self,posx,posy,velx,vely,canvas):
@@ -34,9 +35,9 @@ class Ant:
         self.vely = vely
         self.canvas = canvas
         self.size = 5.
-        #self.canvasposx = 
-        #self.canvasposy = 
-        self.shape = canvas.create_line(posx,posy,posx+self.size*velx,posy+self.size*vely) 
+        self.canvasposx = (posx - x_1)*canvas_size/(x_2-x_1)
+        self.canvasposy = (-posy + y_2)*canvas_size/(y_2-y_1)
+        self.shape = canvas.create_line(self.canvasposx,self.canvasposy,self.canvasposx+self.size*(self.velx),self.canvasposy+self.size*(self.vely))
         self.posxold = posx
         self.posyold = posy
         self.velxold = velx
@@ -55,7 +56,8 @@ class Ant:
         return self.posy + SENSING_AREA_RADIUS*np.sin(Angle(self.velx,self.vely) - SensingAreaHalfAngle)
     def move(self):    
         self.canvas.move(self.shape,self.velx,self.vely)
-    
+#        self.canvas.coords(self.shape,self.canvas.bbox(self.shape))
+
 
 class Droplet:
     def __init__(self,ant,time):
@@ -86,7 +88,7 @@ seed(263232)
 
 
 master =  tk.Tk()
-window = tk.Canvas(master, width=400, height=400)
+window = tk.Canvas(master, width=canvas_size, height=canvas_size)
 window.pack()
 
 for i in range(NumberOfAnts):
@@ -265,7 +267,7 @@ def AdvanceAnt2(j,iter):
         save_this_ant(AllTheAnts[j],j)
 
 cores = mp.cpu_count()
-#    cores=1
+#cores=1
 print('using {} cores'.format(cores))
 
 
@@ -363,7 +365,7 @@ def save_ants(event=None):
 # animation.running = True
 # plt.show()
 
-for i in range(2000):
+for i in range(200):
     do_animation(i)
 
 master.mainloop()
