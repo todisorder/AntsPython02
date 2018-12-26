@@ -80,6 +80,7 @@ def DefineParameters():
     Parameters = [
                 OneParameter(name="NumberOfAnts",value=NumberOfAnts),
                 OneParameter(name="MaxActiveDropletsPerAnt",value=MaxActiveDropletsPerAnt),
+                OneParameter(name="Cores",value=Cores),
                 OneParameter(name="seed1", value=seed1),
                 OneParameter(name="t_hat_in_seconds",value=t_hat_in_seconds),
                 OneParameter(name="X_hat_in_cm",value=X_hat_in_cm),
@@ -95,7 +96,9 @@ def DefineParameters():
                 OneParameter(name="Diffusion",value=Diffusion),
                 OneParameter(name="Evaporation",value=Evaporation),
                 OneParameter(name="DropletAmountPerUnitTime",value=DropletAmountPerUnitTime),
-                OneParameter(name="DropletAmount",value=DropletAmount,formula="DropletAmountPerUnitTime * delta_t",changeable=False),
+                OneParameter(name="drop_every_seconds",value=drop_every_seconds),
+                OneParameter(name="drop_every_t_hat",value=drop_every_t_hat,formula="drop_every_seconds / t_hat_in_seconds",changeable=False),
+                OneParameter(name="DropletAmount",value=DropletAmount,formula="DropletAmountPerUnitTime * drop_every_t_hat",changeable=False),
                 OneParameter(name="Threshold",value=Threshold),
                 OneParameter(name="LambdaDeltas",value=LambdaDeltas,formula="NaturalVelocity/(SENSING_AREA_RADIUS*np.cos(SensingAreaHalfAngle))",changeable=False),
                 OneParameter(name="x_1_cm",value=x_1_cm),
@@ -220,7 +223,7 @@ def write_python_file(event=None):
         if  varslist[i].changeable:
             f.write(varslist[i].name+" = "+ entry_values[i].get()+'\n')
         else:
-            f.write(varslist[i].name+" = "+ str(varslist[i].value)+'\n')
+            f.write(varslist[i].name+" = "+ str(varslist[i].formula)+'\n')
     f.close()
     shutil.copy(filename,lastusedpath)
 #    messagebox.showinfo("","Data was written to python file")

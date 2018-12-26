@@ -20,7 +20,16 @@ from file_to_be_read_by_python import *
 
 Pi = np.pi
 
+
+delta_t = delta_t / t_hat_in_seconds
 CurrentTime = delta_t
+#drop_every_seconds = .5
+#drop_every_t_hat = drop_every_seconds / t_hat_in_seconds
+def drop_or_not(time):
+    return int(time/drop_every_t_hat) - int((time-delta_t)/drop_every_t_hat) == 1
+
+#DropletAmount = DropletAmountPerUnitTime * drop_every_t_hat
+print('will drop {:.3f} phero every {:.4f} t_hat.'.format(DropletAmount,drop_every_t_hat))
 
 
 class Ant:
@@ -76,8 +85,9 @@ seed(263232)
 for i in range(NumberOfAnts):
     posx = random()*(x_2-x_1) + x_1
     posy = random()*(y_2-y_1) + y_1
-    velx = np.cos(random()*2.*Pi)*NaturalVelocity
-    vely = np.sin(random()*2.*Pi)*NaturalVelocity
+    ia =random()*2.*Pi
+    velx = np.cos(ia)*NaturalVelocity
+    vely = np.sin(ia)*NaturalVelocity
     AllTheAnts[i] = Ant(posx,posy,velx,vely)                # Create the ants
 
 
@@ -110,15 +120,15 @@ def FeltPheromone_right(ant):
 
 
 
-def ComputeForcex(ant):
-    numerator = (ant.left_antennax() - ant.posx) * FeltPheromone_left(ant) + (ant.right_antennax() - ant.posx) * FeltPheromone_right(ant)
-    denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
-    ant.forcex = numerator/denom
-
-def ComputeForcey(ant):
-    numer = (ant.left_antennay() - ant.posy) * FeltPheromone_left(ant) + (ant.right_antennay() - ant.posy) * FeltPheromone_right(ant)
-    denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
-    ant.forcey = numer/denom
+#def ComputeForcex(ant):     # deprecated
+#    numerator = (ant.left_antennax() - ant.posx) * FeltPheromone_left(ant) + (ant.right_antennax() - ant.posx) * FeltPheromone_right(ant)
+#    denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
+#    ant.forcex = numerator/denom
+#
+#def ComputeForcey(ant):     # deprecated
+#    numer = (ant.left_antennay() - ant.posy) * FeltPheromone_left(ant) + (ant.right_antennay() - ant.posy) * FeltPheromone_right(ant)
+#    denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
+#    ant.forcey = numer/denom
 
 def ComputeForce(ant):
     ax = ant.posx
@@ -136,8 +146,9 @@ def ComputeForce(ant):
     Fy = numery/denom
     ant.forcex = Fx
     ant.forcey = Fy
+#    print('I am feeling {},{} phero'.format(fpl,fpr))
 
-each = 10
+
 save_every = 10
 
 def Walk(ant,iter):
@@ -147,8 +158,6 @@ def Walk(ant,iter):
     ant.posyold = ant.posy
     ant.velxold = ant.velx
     ant.velyold = ant.vely
-#    ComputeForcex(ant)
-#    ComputeForcey(ant)
     ComputeForce(ant)
     newvelx = ant.velxold + delta_t * (1./TAU)*(-ant.velxold + 1.*ant.forcex)
     newvely = ant.velyold + delta_t * (1./TAU)*(-ant.velyold + 1.*ant.forcey)
@@ -198,10 +207,12 @@ dim = 5.
 #iter = 5000
 
 fig = plt.figure()
-ax = fig.add_axes([0, 0, 1, 1], frameon=False)
+ax = fig.add_axes([0, 0, 1, 1], frameon=True)
 
 ax.set_xlim(x_1, x_2)
 ax.set_ylim(y_1, y_2)
+
+ax.set_aspect('equal')
 
 toons = np.zeros(NumberOfAnts, dtype=[('position', float, 2),
                                       ('size',     float, 1),
@@ -243,9 +254,9 @@ def AdvanceAnt2(j,iter):
 #        print("Wazzzup")
         save_this_ant(AllTheAnts[j],j)
 
-cores = mp.cpu_count()
+#cores = mp.cpu_count()
 #    cores=1
-print('using {} cores'.format(cores))
+print('using {} cores'.format(Cores))
 
 
 def update(iter):
@@ -254,13 +265,13 @@ def update(iter):
     global PreviousPheromone
     global AllTails
     global AllTheAnts
-    global cores
+#    global cores
     CurrentTime = CurrentTime + delta_t
 #    print('Calling update with iter =',iter)
 
     b = list(range(NumberOfAnts))
     
-    pool = mp.Pool(cores)
+    pool = mp.Pool(Cores)
 
     c = [(i,iter) for i in b]
     d = [iter for i in b]
@@ -269,10 +280,14 @@ def update(iter):
     result = pool.starmap(AdvanceAnt,[(j,iter) for j in b])
 #    print(result)
     pool.close()
+    
+    each = drop_or_not(CurrentTime)
+#    print('each = {:.3f}'.format(each))
     for j in [result[k][0] for k in range(len(result))]:
         AllTheAnts[j].posx = result[j][1][0]
         AllTheAnts[j].posy = result[j][1][1]
-        if (iter+1)%each == 0:
+        if each:
+            print('am dropping {} phero'.format(DropletAmount))
             droplet = Droplet(AllTheAnts[j],0)
             AllThePheromone.append(droplet)
 
@@ -295,7 +310,7 @@ def update(iter):
     PreviousPheromone = AllThePheromone
 #    print('iter = ',iter,' Current time = ', CurrentTime, 'drops = ', len(PreviousPheromone))
     execution_time = time.time() - start_time
-    print('--- {} seconds per iteration after {} iterations and {} droplets---'.format(execution_time/(iter+1),iter,len(PreviousPheromone)),end='\r')
+    print('--- {:.4f} seconds per iteration; {} iterations; {:.4f} time (sec); {} droplets---'.format(execution_time/(iter+1),iter,CurrentTime*t_hat_in_seconds,len(PreviousPheromone)),end='\r')
 
 fig.canvas.mpl_connect('key_press_event', on_press)
 
@@ -318,11 +333,11 @@ def save_ants(event=None):
         save_this_ant(AllTheAnts[j],j)
 
 
-axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
-axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-bnext = Button(axnext, 'Next')
-bprev = Button(axprev, 'Previous')
-bnext.on_clicked(save_ants)
+#axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
+#axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
+#bnext = Button(axnext, 'Next')
+#bprev = Button(axprev, 'Previous')
+#bnext.on_clicked(save_ants)
 
 animation = do_animation()
 animation.running = True

@@ -266,9 +266,9 @@ def AdvanceAnt2(j,iter):
 #        print("Wazzzup")
         save_this_ant(AllTheAnts[j],j)
 
-cores = mp.cpu_count()
+#cores = mp.cpu_count()
 #cores=1
-print('using {} cores'.format(cores))
+print('using {} cores'.format(Cores))
 
 
 def update(iter):
@@ -277,13 +277,13 @@ def update(iter):
     global PreviousPheromone
     global AllTails
     global AllTheAnts
-    global cores
+#    global cores
     CurrentTime = CurrentTime + delta_t
 #    print('Calling update with iter =',iter)
 
     b = list(range(NumberOfAnts))
     
-    pool = mp.Pool(cores)
+    pool = mp.Pool(Cores)
 
     c = [(i,iter) for i in b]
     d = [iter for i in b]
