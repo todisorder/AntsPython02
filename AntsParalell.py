@@ -159,8 +159,8 @@ def Walk(ant,iter):
     ant.velxold = ant.velx
     ant.velyold = ant.vely
     ComputeForce(ant)
-    newvelx = ant.velxold + delta_t * (1./TAU)*(-ant.velxold + 1.*ant.forcex)
-    newvely = ant.velyold + delta_t * (1./TAU)*(-ant.velyold + 1.*ant.forcey)
+    newvelx = ant.velxold + delta_t * (1./TAU)*(-ant.velxold + LambdaDeltas*ant.forcex)
+    newvely = ant.velyold + delta_t * (1./TAU)*(-ant.velyold + LambdaDeltas*ant.forcey)
 #    print('changed velocity from {} to {}'.format(ant.velyold,newvely))
     newposx = ant.posxold + delta_t * newvelx
     newposy = ant.posyold + delta_t * newvely
@@ -207,16 +207,24 @@ dim = 5.
 #iter = 5000
 
 fig = plt.figure()
+
+#fig_phero = plt.figure()
+
 ax = fig.add_axes([0, 0, 1, 1], frameon=True)
+#ax_phero = fig_phero.add_axes([0, 0, 1, 1], frameon=True)
 
 ax.set_xlim(x_1, x_2)
 ax.set_ylim(y_1, y_2)
+#ax_phero.set_xlim(x_1, x_2)
+#ax_phero.set_ylim(y_1, y_2)
 
 ax.set_aspect('equal')
+#ax_phero.set_aspect('equal')
 
 toons = np.zeros(NumberOfAnts, dtype=[('position', float, 2),
                                       ('size',     float, 1),
                                       ('color',    float, 4)])
+
 
 tail_length = 40
 #tail = np.zeros(NumberOfAnts, dtype=[('x', float, tail_length),
@@ -290,6 +298,8 @@ def update(iter):
             print('am dropping {} phero'.format(DropletAmount))
             droplet = Droplet(AllTheAnts[j],0)
             AllThePheromone.append(droplet)
+            ax.scatter(droplet.posx,droplet.posy,s=20,c='c',alpha=0.2)
+
 
 
 
