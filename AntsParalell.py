@@ -45,6 +45,8 @@ class Ant:
         self.turning_angle = 0.
         self.forcex = 0.
         self.forcey = 0.
+        self.stingposx = self.posx - SENSING_AREA_RADIUS*np.cos(Angle(self.velx,self.vely))
+        self.stingposy = self.posy - SENSING_AREA_RADIUS*np.sin(Angle(self.velx,self.vely))
 
     def left_antennax(self):
         return self.posx + SENSING_AREA_RADIUS*np.cos(Angle(self.velx,self.vely) + SensingAreaHalfAngle)
@@ -58,8 +60,8 @@ class Ant:
 class Droplet:
     def __init__(self,ant,time):
         self.origin_time = time
-        self.posx = ant.posx
-        self.posy = ant.posy
+        self.posx = ant.stingposx
+        self.posy = ant.stingposy
     def elapsed_time(self):
         return CurrentTime - self.origin_time
     def show(self):
@@ -175,6 +177,8 @@ def Walk(ant,iter):
     ant.posy = newposy
     ant.velx = newvelx
     ant.vely = newvely
+
+
 
 #    if (iter+1)%each == 0:
 ##        print('eeeee')
@@ -295,10 +299,12 @@ def update(iter):
         AllTheAnts[j].posx = result[j][1][0]
         AllTheAnts[j].posy = result[j][1][1]
         if each:
-            print('am dropping {} phero'.format(DropletAmount))
+#            print('am dropping {} phero'.format(DropletAmount))
+            AllTheAnts[j].stingposx = AllTheAnts[j].posx - SENSING_AREA_RADIUS*np.cos(Angle(AllTheAnts[j].velx,AllTheAnts[j].vely))
+            AllTheAnts[j].stingposy = AllTheAnts[j].posy - SENSING_AREA_RADIUS*np.sin(Angle(AllTheAnts[j].velx,AllTheAnts[j].vely))
             droplet = Droplet(AllTheAnts[j],0)
             AllThePheromone.append(droplet)
-            ax.scatter(droplet.posx,droplet.posy,s=20,c='c',alpha=0.2)
+            droplet_drawing = ax.scatter(droplet.posx,droplet.posy,s=40,c='c',alpha=0.1)
 
 
 
