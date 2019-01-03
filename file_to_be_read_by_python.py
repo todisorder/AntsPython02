@@ -1,5 +1,5 @@
 import numpy as np
-NumberOfAnts = 20
+NumberOfAnts = 3
 MaxActiveDropletsPerAnt = 3000
 Cores = 4
 seed1 = 1

@@ -28,6 +28,7 @@ CurrentTime = delta_t
 def drop_or_not(time):
     return int(time/drop_every_t_hat) - int((time-delta_t)/drop_every_t_hat) == 1
 
+
 #DropletAmount = DropletAmountPerUnitTime * drop_every_t_hat
 print('will drop {:.3f} phero every {:.4f} t_hat.'.format(DropletAmount,drop_every_t_hat))
 
@@ -62,7 +63,7 @@ class Droplet:
         self.origin_time = time
         self.posx = ant.stingposx
         self.posy = ant.stingposy
-    def elapsed_time(self):
+    def elapsed_time(self,CurrentTime):
         return CurrentTime - self.origin_time
     def show(self):
         print(self.posx,self.posy,self.elapsed_time())
@@ -236,6 +237,9 @@ tail_length = 40
 tailx = [[0.]*tail_length]*NumberOfAnts
 taily = [[0.]*tail_length]*NumberOfAnts
 
+droplet_drawing = ax.scatter([0],[0])
+#droplet_drawing.remove()
+
 for i in range(NumberOfAnts):
         tailx[i] = [AllTheAnts[i].posx]*tail_length
         taily[i] = [AllTheAnts[i].posy]*tail_length
@@ -270,8 +274,10 @@ def AdvanceAnt2(j,iter):
 #    cores=1
 print('using {} cores'.format(Cores))
 
-
+plot_exists = False
 def update(iter):
+    global droplet_drawing
+    global plot_exists
     global CurrentTime
     global AllThePheromone
     global PreviousPheromone
@@ -292,8 +298,18 @@ def update(iter):
     result = pool.starmap(AdvanceAnt,[(j,iter) for j in b])
 #    print(result)
     pool.close()
-    
+
+    how_many_droplets = len(AllThePheromone)
+    print('droplets are in number {}'.format(how_many_droplets))
+    dropx = [AllThePheromone[j].posx for j in range(how_many_droplets)]
+    dropy = [AllThePheromone[j].posy for j in range(how_many_droplets)]
+    drop_sizes = [1000*np.sqrt(.1*AllThePheromone[j].elapsed_time(CurrentTime)) for j in range(how_many_droplets)]
+    drop_alpha = [np.exp(-AllThePheromone[j].elapsed_time(CurrentTime)) for j in range(how_many_droplets)]
+    colors_for_alpha = [[1,0,0,j] for j in  drop_alpha]
+#    drop_sizes = [100+j for j in range(how_many_droplets)]
+#    print(drop_alpha)
     each = drop_or_not(CurrentTime)
+    print(drop_or_not(CurrentTime))
 #    print('each = {:.3f}'.format(each))
     for j in [result[k][0] for k in range(len(result))]:
         AllTheAnts[j].posx = result[j][1][0]
@@ -302,9 +318,31 @@ def update(iter):
 #            print('am dropping {} phero'.format(DropletAmount))
             AllTheAnts[j].stingposx = AllTheAnts[j].posx - SENSING_AREA_RADIUS*np.cos(Angle(AllTheAnts[j].velx,AllTheAnts[j].vely))
             AllTheAnts[j].stingposy = AllTheAnts[j].posy - SENSING_AREA_RADIUS*np.sin(Angle(AllTheAnts[j].velx,AllTheAnts[j].vely))
-            droplet = Droplet(AllTheAnts[j],0)
+            droplet = Droplet(AllTheAnts[j],CurrentTime)
             AllThePheromone.append(droplet)
-            droplet_drawing = ax.scatter(droplet.posx,droplet.posy,s=40,c='c',alpha=0.1)
+            droplet_drawing.remove()
+            droplet_drawing = ax.scatter(dropx,dropy,s=drop_sizes,c=colors_for_alpha,edgecolors='none')
+#            droplet_drawing = ax.scatter(droplet.posx,droplet.posy,s=40,c='c',edgecolors='none',alpha=0.5)
+#            print(drop_sizes)
+#            droplet_drawing.set_sizes(drop_sizes)
+            plot_exists = True
+
+#    how_many_droplets = len(AllThePheromone)
+#    dropx = [AllThePheromone[j].posx for j in range(how_many_droplets)]
+#    dropy = [AllThePheromone[j].posy for j in range(how_many_droplets)]
+#    drop_sizes = [AllThePheromone[j].elapsed_time for j in range(how_many_droplets)]
+#    droplet_drawing.set_sizes(drop_sizes)
+
+    if plot_exists:
+        pass
+#        droplet_drawing.set_sizes(drop_sizes)
+    else:
+        pass
+
+#    droplet_drawing = ax.scatter(dropx,dropy,s=40,c='c',alpha=0.1)
+
+#    for j in range(len(AllThePheromone)):
+#        droplet_drawing.set_sizes(AllThePheromone[j].elapsed_time())
 
 
 
