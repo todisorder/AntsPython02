@@ -104,7 +104,7 @@ def Heat(x,y,t):
 
 def FeltPheromone_left(ant):
     result = []
-    for ph in PreviousPheromone:
+    for ph in AllThePheromone:
         x = ph.posx - ant.left_antennax()
         y = ph.posy - ant.left_antennay()
         t = CurrentTime - ph.origin_time
@@ -113,7 +113,7 @@ def FeltPheromone_left(ant):
 
 def FeltPheromone_right(ant):
     result = []
-    for ph in PreviousPheromone:
+    for ph in AllThePheromone:
         x = ph.posx - ant.right_antennax()
         y = ph.posy - ant.right_antennay()
         t = CurrentTime - ph.origin_time
@@ -123,15 +123,6 @@ def FeltPheromone_right(ant):
 
 
 
-#def ComputeForcex(ant):     # deprecated
-#    numerator = (ant.left_antennax() - ant.posx) * FeltPheromone_left(ant) + (ant.right_antennax() - ant.posx) * FeltPheromone_right(ant)
-#    denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
-#    ant.forcex = numerator/denom
-#
-#def ComputeForcey(ant):     # deprecated
-#    numer = (ant.left_antennay() - ant.posy) * FeltPheromone_left(ant) + (ant.right_antennay() - ant.posy) * FeltPheromone_right(ant)
-#    denom = FeltPheromone_left(ant) + FeltPheromone_right(ant)
-#    ant.forcey = numer/denom
 
 def ComputeForce(ant):
     ax = ant.posx
@@ -372,7 +363,7 @@ def update(iter):
 
 
         AllThePheromone = AllThePheromone[-MaxActiveDropletsPerAnt:]
-        PreviousPheromone = AllThePheromone
+#        PreviousPheromone = AllThePheromone
     #    print('iter = ',iter,' Current time = ', CurrentTime, 'drops = ', len(PreviousPheromone))
         execution_time = time.time() - start_time
     #    print('--- {:.4f} seconds per iteration; {} iterations; {:.4f} time (sec); {} droplets---'.format(execution_time/(iter+1),iter,CurrentTime*t_hat_in_seconds,len(PreviousPheromone)),end='\r')
