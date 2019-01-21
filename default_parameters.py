@@ -33,3 +33,4 @@ x_1 = x_1_cm / X_hat_in_cm
 x_2 = x_2_cm / X_hat_in_cm
 y_1 = y_1_cm / X_hat_in_cm
 y_2 = y_2_cm / X_hat_in_cm
+BC = "periodic"

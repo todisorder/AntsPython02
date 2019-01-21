@@ -1,31 +1,17 @@
-python3 GUIpy.py && python3 AntsParalell.py
+echo "Press Return to use same parameters, other key to change parameters."
+read -s -n 1 key  # -s: do not echo input character. -n 1: read only 1 character (separate with space)
+# double brackets to test, single equals sign, empty string for just 'enter' in this case...
+# if [[ ... ]] is followed by semicolon and 'then' keyword
+DIR=Plots
+if [ -d "$DIR" ]; then
+rm -rf "$DIR"
+fi
+mkdir "$DIR"
+
+if [[ $key = "" ]]; then
+    python3 AntsParalell.py
+else
+    python3 GUIpy.py && python3 AntsParalell.py
+fi
 
 
-#echo "Results folder name:"
-#read Folder
-#Version="-08"
-#[ -d "$Folder" ] && rm -r "$Folder"
-#mkdir "$Folder"
-#cp antsibm"$Version"  "$Folder"
-#cp AntsIBM"$Version".cpp  "$Folder"/CPPAntsIBMUsado.cpp
-#cp Classes.h  "$Folder"/ClassesUsado.h
-#cp plot-png.sh  "$Folder"
-#cp PlotAntOnTrail.sh  "$Folder"
-##cp plots-Mass.plt  "$Folder"
-#cd "$Folder"
-#
-#./antsibm"$Version" &&
-##mkdir Plots
-##sh plot-png.sh &&
-##gnuplot plots-Mass.plt
-##cp ../LogsLast.txt .
-#
-#[ ! -d ../LastResult ] && mkdir ../LastResult
-#touch ../LastResult/Paranaochatearcomerrosdorm.txt
-#rm -r ../LastResult/*
-#cp -r * ../LastResult/
-#cp Phero.txt ../LastResult/
-#
-#echo "Done!"
-#
-##osascript -e 'tell app "System Events" to display dialog "Calculo terminado." with icon 1 with title "Calculo terminado." '

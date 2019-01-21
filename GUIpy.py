@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import shutil
 import os
+import platform
 import numpy as np
 
 lastusedpath = 'last_used_parameters.py'
@@ -109,6 +110,7 @@ def DefineParameters():
                 OneParameter(name="x_2",value=x_2, formula="x_2_cm / X_hat_in_cm",changeable=False),
                 OneParameter(name="y_1",value=y_1, formula="y_1_cm / X_hat_in_cm",changeable=False),
                 OneParameter(name="y_2",value=y_2, formula="y_2_cm / X_hat_in_cm",changeable=False),
+#                OneParameter(name="BC",value=wrapq("periodic") ),
                 ]
     return Parameters
 
@@ -215,6 +217,7 @@ for k in range(len(varslist)):
 
 def write_python_file(event=None):
     global lastusedpath
+#    global boundary_mode
     filename = "file_to_be_read_by_python.py"
     f = open(filename,"w").close()
     f = open(filename,"a")
@@ -224,6 +227,7 @@ def write_python_file(event=None):
             f.write(varslist[i].name+" = "+ entry_values[i].get()+'\n')
         else:
             f.write(varslist[i].name+" = "+ str(varslist[i].formula)+'\n')
+    f.write("BC = \'"+ boundary_mode.get() +"\'" +'\n')
     f.close()
     shutil.copy(filename,lastusedpath)
 #    messagebox.showinfo("","Data was written to python file")
@@ -242,9 +246,10 @@ def SetupEntryField(varslist,window):
     nr_of_vars = len(varslist)
     entry_list = [0]*nr_of_vars
     entry_labels = [0]*nr_of_vars
-    lines_on_the_window = 16
+    lines_on_the_window = 17
     li = lines_on_the_window
     counter=-1
+    boundary_mode = StringVar(value=BC)
     for var in varslist:
         counter += 1
         i = counter
@@ -259,14 +264,23 @@ def SetupEntryField(varslist,window):
             entry_labels[i].grid(sticky=W,ipadx="2cm",column=2*int(i/li),row=i%li+1)
             entry_list[i] = Label(window, text=var.value)
             entry_list[i].grid(column=2*int(i/li)+1,row=i%li+1)
-    return entry_list, entry_labels
+    rb1 = Radiobutton(window,text="Periodic BC",variable=boundary_mode,value="periodic",indicatoron=1,state='active')
+    i=counter+1
+    rb1.grid(column=2*int(i/li),row=i%li+1)
+    rb2 = Radiobutton(window,text="Reflecitve BC",variable=boundary_mode,value="reflective",indicatoron=1)
+    i=i+1
+    rb2.grid(column=2*int(i/li),row=i%li+1)
+
+    return entry_list, entry_labels, boundary_mode
 
 
 def UseDefaults(event=None):
-    print("AAAAA")
+    global varslist
+    global window
     shutil.copy(default_path,'file_to_be_read_by_python.py')
     shutil.copy(default_path,lastusedpath)
-#    pass
+    messagebox.showinfo("","Defaults will be used")
+    #    pass
 
 #def UseLast(event=None):
 #    shutil.copy(lastusedpath,'file_to_be_read_by_python.py')
@@ -289,12 +303,13 @@ btn2 = Button(window, text="Ret: Use present values", command=write_files)
 btn2.grid(column=1, row=0)
 
 
-import platform
+
 if platform.system() == 'Darwin':
     os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
-[entry_values, entry_labels] = SetupEntryField(varslist,window)
+[entry_values, entry_labels,boundary_mode] = SetupEntryField(varslist,window)
 entry_values[0].focus()
+
 
 #btn1 = Button(window, text="1: Use defauls", command=UseDefaults)
 #btn1.grid(column=0, row=0)
