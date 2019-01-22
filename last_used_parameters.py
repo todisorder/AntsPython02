@@ -1,7 +1,7 @@
 import numpy as np
 NumberOfAnts = 50
-MaxActiveDropletsPerAnt = 100
-Cores = 2
+MaxActiveDropletsPerAnt = 150
+Cores = 1
 seed1 = 2
 t_hat_in_seconds = 1.0
 X_hat_in_cm = 1.0
@@ -22,12 +22,12 @@ drop_every_t_hat = drop_every_seconds / t_hat_in_seconds
 DropletAmount = DropletAmountPerUnitTime * drop_every_t_hat
 Threshold = 0.2
 LambdaDeltas = NaturalVelocity/(SENSING_AREA_RADIUS*np.cos(SensingAreaHalfAngle))
-x_1_cm = -20
-x_2_cm = 20
-y_1_cm = -20
-y_2_cm = 20
+x_1_cm = -50
+x_2_cm = 50
+y_1_cm = -50
+y_2_cm = 50
 x_1 = x_1_cm / X_hat_in_cm
 x_2 = x_2_cm / X_hat_in_cm
 y_1 = y_1_cm / X_hat_in_cm
 y_2 = y_2_cm / X_hat_in_cm
-BC = 'periodic'
+BC = 'reflective'

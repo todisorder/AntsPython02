@@ -194,7 +194,8 @@ def FeltPheromone(ant):
         SW = [sum(x) for x in zip(S,W)]
         SE = [sum(x) for x in zip(S,E)]
         neighboring_squares = [N,S,E,W,NW,NE,SW,SE]
-        near = [p[0] for p in ant.nearphero]
+#        near = [p[0] for p in ant.nearphero]
+        near = ant.nearphero
         for ph in near:
             xl = ph.posx - alx
             yl = ph.posy - aly
@@ -207,7 +208,8 @@ def FeltPheromone(ant):
                 resultL = resultL + Heat(xl+dir[0],yl+dir[1],t)
                 resultR = resultR + Heat(xr+dir[0],yr+dir[1],t)
     if BC == 'reflective':
-        near = [p[0] for p in ant.nearphero]
+#        near = [p[0] for p in ant.nearphero]
+        near = ant.nearphero
         for ph in near:
             xl = ph.posx - alx
             yl = ph.posy - aly
@@ -390,14 +392,13 @@ def DrawPheromone(j):
 
 print('using {} cores'.format(Cores))
 
-plot_exists = False
 real_iter = 1
-real_iter_each_iter = 10
+real_iter_each_iter = 20
 a_certain_radius = 10.*SENSING_AREA_RADIUS
 
 rad = a_certain_radius*a_certain_radius
 will_probably_walk_this_much = NaturalVelocity*delta_t
-save_some_iterations = 20
+save_some_iterations = 10
 smaller_radius = a_certain_radius - save_some_iterations * will_probably_walk_this_much
 smaller_radius *= smaller_radius
 '''  droplets inside this squared radius will stay near even after save_some_iterations iterations. '''
@@ -445,13 +446,15 @@ def update(iter):
         ''' drop pheromones '''
         each = drop_or_not(CurrentTime)
         if each:
-            NewPheromone = []
-            for j in [result[k][0] for k in range(len(result))]:
+            print('dropping')
+#            NewPheromone = []
+            for j in b:
+#            for j in [result[k][0] for k in range(len(result))]:
                 AllTheAnts[j].stingposx = AllTheAnts[j].posx - SENSING_AREA_RADIUS*np.cos(Angle(AllTheAnts[j].velx,AllTheAnts[j].vely))
                 AllTheAnts[j].stingposy = AllTheAnts[j].posy - SENSING_AREA_RADIUS*np.sin(Angle(AllTheAnts[j].velx,AllTheAnts[j].vely))
                 droplet = Droplet(AllTheAnts[j],CurrentTime)
                 AllThePheromone.append(droplet)
-                NewPheromone.append(droplet)
+#                NewPheromone.append(droplet)
 
 
         ''' compute near pheromones for each ant '''
@@ -463,7 +466,7 @@ def update(iter):
                 posdrop = [drop.posx,drop.posy]
                 distsq = DistanceSq(posant,posdrop)
                 if distsq <= rad:
-                    AllTheAnts[j].nearphero.append([drop,distsq])
+                    AllTheAnts[j].nearphero.append(drop)
 
 
 #
